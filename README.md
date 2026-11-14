@@ -1,0 +1,2 @@
+# logicProgrammingMidterm
+Vibecodded Shit
