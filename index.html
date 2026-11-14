@@ -116,9 +116,9 @@
   <div class="pointer-events-none fixed -top-40 left-1/4 h-96 w-96 rounded-full bg-emerald-500/[0.07] blur-3xl z-0"></div>
   <div class="pointer-events-none fixed top-1/3 right-10 h-96 w-96 rounded-full bg-indigo-500/[0.07] blur-3xl z-0"></div>
 
-  <!-- FLOATING GLASSMORPHIC NAVBAR (Hidden in Cockpit Speedrun Mode) -->
-  <header id="main-navbar" class="sticky top-3 z-40 mx-auto max-w-7xl px-4 pt-2">
-    <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#090C14]/85 px-4 py-3 backdrop-blur-xl shadow-glass">
+  <!-- FLOATING GLASSMORPHIC NAVBAR (Auto-hides on scroll down, reveals on scroll up) -->
+  <header id="main-navbar" class="sticky top-3 z-40 mx-auto max-w-7xl px-4 pt-2 transition-all duration-300 ease-out will-change-transform">
+    <div class="flex flex-wrap lg:flex-nowrap items-center justify-between gap-2.5 rounded-2xl border border-white/10 bg-[#090C14]/85 px-4 py-2.5 backdrop-blur-xl shadow-glass">
       <!-- Brand Emblem + VECTR // LOGIC Wordmark -->
       <button id="nav-brand-btn" type="button" class="group flex items-center gap-3 text-left focus:outline-none">
         <div class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/35 bg-gradient-to-br from-emerald-500/20 via-indigo-500/10 to-transparent">
@@ -480,6 +480,10 @@
           <button type="button" data-solve-timer-sec="45" class="solve-timer-sec-btn rounded px-1.5 py-0.5">45s</button>
           <button type="button" data-solve-timer-sec="60" class="solve-timer-sec-btn rounded px-1.5 py-0.5">60s</button>
           <button type="button" data-solve-timer-sec="90" class="solve-timer-sec-btn rounded px-1.5 py-0.5">90s</button>
+          <div class="flex items-center gap-1 rounded border border-white/15 bg-black/60 px-1.5 py-0.5" title="Set Custom Timer Seconds">
+            <input id="solve-timer-custom-input" type="number" min="5" max="999" value="45" class="w-11 bg-transparent font-mono text-xs font-bold text-emerald-300 focus:outline-none text-center tabular-nums" />
+            <span class="text-[10px] text-zinc-400">s</span>
+          </div>
           <span id="solve-timer-readout" class="ml-1 rounded bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 font-bold text-amber-300 tabular-nums">OFF</span>
         </div>
       </div>
@@ -572,17 +576,24 @@
       </div>
     </aside>
 
-    <!-- Speedrun Settings Popover (Switch Decks) -->
-    <div id="speedrun-settings-popover" class="hidden absolute bottom-6 left-20 z-40 w-80 rounded-2xl border border-white/15 bg-[#0C0F18]/95 p-4 backdrop-blur-xl shadow-2xl space-y-2">
+    <!-- Speedrun Settings Popover (Custom Timer + Switch Decks) -->
+    <div id="speedrun-settings-popover" class="hidden absolute bottom-6 left-20 z-40 w-80 rounded-2xl border border-white/15 bg-[#0C0F18]/95 p-4 backdrop-blur-xl shadow-2xl space-y-3">
       <div class="flex items-center justify-between border-b border-white/10 pb-2">
-        <span class="font-mono text-xs font-bold uppercase text-amber-400">Switch Speedrun Deck</span>
+        <span class="font-mono text-xs font-bold uppercase text-amber-400">Speedrun Settings &amp; Decks</span>
         <button id="speedrun-settings-close" type="button" class="font-mono text-xs text-zinc-400 hover:text-white">✕</button>
       </div>
-      <div id="speedrun-deck-options" class="space-y-1.5 pt-1"></div>
+      <div class="rounded-xl border border-white/10 bg-black/40 p-3 space-y-2">
+        <label for="sr-popover-custom-sec" class="block font-mono text-[11px] font-bold text-emerald-300">⏱ Custom Timer Duration (Seconds):</label>
+        <div class="flex items-center gap-2">
+          <input id="sr-popover-custom-sec" type="number" min="3" max="999" value="30" class="w-full rounded-lg border border-white/15 bg-[#07090F] px-3 py-1.5 font-mono text-xs font-bold text-white focus:border-amber-400 focus:outline-none tabular-nums" />
+          <button id="sr-popover-apply-sec" type="button" class="shrink-0 rounded-lg bg-amber-500 px-3 py-1.5 font-mono text-xs font-extrabold text-slate-950 hover:brightness-110">Apply</button>
+        </div>
+      </div>
+      <div id="speedrun-deck-options" class="space-y-1.5 pt-1 max-h-60 overflow-y-auto"></div>
     </div>
 
     <!-- DRAGGABLE FLYING TIMER WIDGET (Top-Right by default, draggable anywhere) -->
-    <div id="flying-timer-hud" style="right: 24px; top: 20px;" class="fixed z-40 flex cursor-grab active:cursor-grabbing select-none items-center gap-2.5 rounded-full border border-white/15 bg-[#0D111A]/90 px-4 py-2 backdrop-blur-xl shadow-2xl">
+    <div id="flying-timer-hud" style="right: 24px; top: 20px;" class="fixed z-40 flex cursor-grab active:cursor-grabbing select-none items-center gap-2 rounded-full border border-white/15 bg-[#0D111A]/90 px-3.5 py-2 backdrop-blur-xl shadow-2xl">
       <span class="font-mono text-xs text-zinc-500" title="Drag Timer Anywhere">⋮⋮</span>
       <span id="flying-timer-dot" class="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
       <span id="flying-timer-readout" class="font-mono text-sm font-extrabold text-white tabular-nums">00:30</span>
@@ -595,6 +606,10 @@
       <button id="flying-timer-cycle" type="button" title="Cycle Preset (15s / 30s / 45s / 60s / OFF)" class="rounded-full border border-amber-500/40 bg-amber-500/20 px-2.5 py-0.5 font-mono text-[11px] font-bold text-amber-300 hover:bg-amber-500/30">
         30s
       </button>
+      <div class="flex items-center gap-0.5 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2 py-0.5" title="Set Custom Seconds">
+        <input id="flying-timer-custom-input" type="number" min="3" max="999" value="30" class="w-10 bg-transparent font-mono text-[11px] font-bold text-emerald-300 focus:outline-none text-center tabular-nums" />
+        <span class="font-mono text-[10px] text-emerald-400/80">s</span>
+      </div>
     </div>
 
     <!-- Minimal Cockpit Stage -->
@@ -5932,7 +5947,7 @@ const QUESTIONS = [
         btn.className = `flex items-center justify-between gap-3 rounded-2xl border p-4 text-left transition ${cls}`;
         btn.innerHTML = `
           <div class="flex items-center gap-3">
-            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-black/50 font-mono text-xs font-bold">${oIdx + 1} / ${opt.id.toUpperCase()}</span>
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/15 bg-black/50 font-mono text-sm font-extrabold tabular-nums">${oIdx + 1}</span>
             <span class="text-sm sm:text-base font-semibold">${opt.text}</span>
           </div>
           <span class="font-mono text-sm font-bold">${isAnswered && isRight ? '✓' : isAnswered && isSelected && !isRight ? '✗' : ''}</span>
@@ -5947,14 +5962,15 @@ const QUESTIONS = [
       const trapEl = document.getElementById('sr-trap-alert');
 
       const isTimeout = userAns === 'timeout';
+      const correctNum = q.options.findIndex(o => o.id === q.correctOptionId) + 1;
       if (isAnswered) {
         expWrap.classList.remove('hidden');
         expStatus.className = `font-mono text-xs font-bold ${isCorrect ? 'text-emerald-400' : 'text-rose-400'}`;
         expStatus.textContent = isCorrect
           ? '✓ CORRECT — INSTANT BILINGUAL EXPLANATION'
           : isTimeout
-          ? `⏱ TIME UP! (CORRECT: ${q.correctOptionId.toUpperCase()}) — RE-QUEUED +3 SLOTS AHEAD`
-          : `✗ MISSED (CORRECT: ${q.correctOptionId.toUpperCase()}) — RE-QUEUED +3 SLOTS AHEAD`;
+          ? `⏱ TIME UP! (CORRECT: #${correctNum}) — RE-QUEUED +3 SLOTS AHEAD`
+          : `✗ MISSED (CORRECT: #${correctNum}) — RE-QUEUED +3 SLOTS AHEAD`;
         expBody.classList.toggle('hidden', !state.srShowExplanation);
         expBody.innerHTML = q.explanation;
 
@@ -6118,6 +6134,20 @@ const QUESTIONS = [
         });
       }
 
+      // Auto-hide navbar when scrolling down, reveal when scrolling up
+      let lastScrollY = window.scrollY || 0;
+      const mainNavbar = document.getElementById('main-navbar');
+      window.addEventListener('scroll', () => {
+        if (state.activeView === 'speedrun' || !mainNavbar) return;
+        const currentScrollY = window.scrollY || 0;
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+          mainNavbar.classList.add('-translate-y-[140%]', 'opacity-0', 'pointer-events-none');
+        } else if (currentScrollY < lastScrollY - 6 || currentScrollY <= 40) {
+          mainNavbar.classList.remove('-translate-y-[140%]', 'opacity-0', 'pointer-events-none');
+        }
+        lastScrollY = Math.max(0, currentScrollY);
+      }, { passive: true });
+
       // Navbar navigation listeners
       document.getElementById('nav-brand-btn').addEventListener('click', () => setActiveView('dashboard'));
       document.querySelectorAll('.nav-tab-btn').forEach(btn => {
@@ -6274,9 +6304,19 @@ const QUESTIONS = [
       document.querySelectorAll('.solve-timer-sec-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           state.solveTimerPreset = Number(btn.getAttribute('data-solve-timer-sec'));
+          const customSolveInput = document.getElementById('solve-timer-custom-input');
+          if (customSolveInput) customSolveInput.value = String(state.solveTimerPreset);
           state.solveTimeLeft = state.solveTimerMode === 'page' ? state.solveTimerPreset * state.solvePageSize : state.solveTimerPreset;
           renderSolvingView();
         });
+      });
+      document.getElementById('solve-timer-custom-input').addEventListener('change', e => {
+        const val = Math.max(3, Math.min(999, Number(e.target.value) || 45));
+        e.target.value = String(val);
+        state.solveTimerPreset = val;
+        if (state.solveTimerMode === 'off') state.solveTimerMode = 'question';
+        state.solveTimeLeft = state.solveTimerMode === 'page' ? val * state.solvePageSize : val;
+        renderSolvingView();
       });
 
       // Speedrun Cockpit controls
@@ -6331,7 +6371,7 @@ const QUESTIONS = [
       let dragOffsetY = 0;
 
       hud.addEventListener('pointerdown', e => {
-        if (e.target.tagName === 'BUTTON') return;
+        if (['BUTTON', 'INPUT'].includes(e.target.tagName)) return;
         draggingHud = true;
         const rect = hud.getBoundingClientRect();
         dragOffsetX = e.clientX - rect.left;
@@ -6384,10 +6424,44 @@ const QUESTIONS = [
         resetSrTimerToPreset();
         updateFlyingTimerUI();
       });
+      const applyCustomSpeedrunTimer = (rawSeconds) => {
+        const sec = Math.max(3, Math.min(999, Number(rawSeconds) || 30));
+        // Store custom duration at index 0 or update current active numeric preset
+        if (state.srPresets[state.srPresetIdx] === 'OFF') {
+          state.srPresetIdx = 0;
+        }
+        state.srPresets[state.srPresetIdx] = sec;
+        state.srTimeLeft = sec;
+        state.srTimerRunning = true;
+        const hudInput = document.getElementById('flying-timer-custom-input');
+        const popInput = document.getElementById('sr-popover-custom-sec');
+        if (hudInput) hudInput.value = String(sec);
+        if (popInput) popInput.value = String(sec);
+        clearSrAutoAdvance();
+        updateFlyingTimerUI();
+      };
+
       document.getElementById('flying-timer-cycle').addEventListener('click', () => {
         state.srPresetIdx = (state.srPresetIdx + 1) % state.srPresets.length;
+        const cur = state.srPresets[state.srPresetIdx];
+        if (typeof cur === 'number') {
+          const hudInput = document.getElementById('flying-timer-custom-input');
+          const popInput = document.getElementById('sr-popover-custom-sec');
+          if (hudInput) hudInput.value = String(cur);
+          if (popInput) popInput.value = String(cur);
+        }
         resetSrTimerToPreset();
         updateFlyingTimerUI();
+      });
+
+      document.getElementById('flying-timer-custom-input').addEventListener('change', e => {
+        applyCustomSpeedrunTimer(e.target.value);
+      });
+
+      document.getElementById('sr-popover-apply-sec').addEventListener('click', () => {
+        const popInput = document.getElementById('sr-popover-custom-sec');
+        if (popInput) applyCustomSpeedrunTimer(popInput.value);
+        document.getElementById('speedrun-settings-popover').classList.add('hidden');
       });
 
       // Global 1-second timer tick for Solving Mode & Speedrun Mode
